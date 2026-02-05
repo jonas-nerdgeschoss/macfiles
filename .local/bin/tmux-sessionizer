@@ -8,11 +8,11 @@ if [[ $# -eq 1 ]]; then
 else
   selected=$(
     (
-      find -L /home -mindepth 1 -maxdepth 1 -type d | sort
+      find -L /Users -mindepth 1 -maxdepth 1 -type d | sort
       echo ~/code
       find -L "$HOME/code" -mindepth 2 -maxdepth 2 -iname '.git' | sed -e 's/\/.git$//' | sort
       find -L "$HOME/code" -mindepth 3 -maxdepth 3 -iname '.git' | sed -e 's/\/.git$//' | sort
-      echo ~/.dotfiles
+      echo ~/.macfiles
     ) | fzf --cycle
   )
 fi
