@@ -20,15 +20,11 @@ export KEYTIMEOUT=1
 
 # Change cursor shape for different vi modes.
 function zle-keymap-select {
-  if [[ ${KEYMAP} == vicmd ]] ||
-     [[ $1 = 'block' ]]; then
-    echo -ne '\e[2 q'
-  elif [[ ${KEYMAP} == main ]] ||
-       [[ ${KEYMAP} == viins ]] ||
-       [[ ${KEYMAP} = '' ]] ||
-       [[ $1 = 'beam' ]]; then
-    echo -ne '\e[6 q'
-  fi
+    if [[ ${KEYMAP} == vicmd ]] || [[ $1 = 'block' ]]; then
+        echo -ne '\e[2 q'
+    elif [[ ${KEYMAP} == main ]] || [[ ${KEYMAP} == viins ]] || [[ ${KEYMAP} = '' ]] || [[ $1 = 'beam' ]]; then
+        echo -ne '\e[6 q'
+    fi
 }
 zle -N zle-keymap-select
 zle-line-init() {
@@ -45,12 +41,18 @@ zle -N edit-command-line
 bindkey '^v' edit-command-line
 
 # Completion
-zstyle :compinstall filename '$HOME/.zshrc'
+FPATH="$(brew --prefix)/share/zsh-completions:$FPATH"
+FPATH="$HOME/.docker/completions:$FPATH"
 autoload -Uz compinit
 compinit
+
+# Case-insensitive autocomplete
 zstyle ':completion:*' matcher-list 'm:{a-z}={A-Za-z}'
+
+# Autocomplete SSH hosts
 zstyle ':completion:*:ssh:*' hosts
-# Also autocomplete hidden files
+
+# Autocomplete hidden files
 setopt globdots
 
 # Special keys
@@ -86,11 +88,11 @@ key[Shift-Tab]="${terminfo[kcbt]}"
 # Finally, make sure the terminal is in application mode, when zle is
 # active. Only then are the values from $terminfo valid.
 if (( ${+terminfo[smkx]} && ${+terminfo[rmkx]} )); then
-	autoload -Uz add-zle-hook-widget
-	function zle_application_mode_start { echoti smkx }
-	function zle_application_mode_stop { echoti rmkx }
-	add-zle-hook-widget -Uz zle-line-init zle_application_mode_start
-	add-zle-hook-widget -Uz zle-line-finish zle_application_mode_stop
+    autoload -Uz add-zle-hook-widget
+    function zle_application_mode_start { echoti smkx }
+    function zle_application_mode_stop { echoti rmkx }
+    add-zle-hook-widget -Uz zle-line-init zle_application_mode_start
+    add-zle-hook-widget -Uz zle-line-finish zle_application_mode_stop
 fi
 
 # More special keys
@@ -112,17 +114,17 @@ key[Control-Right]="${terminfo[kRIT5]}"
 ZLE_REMOVE_SUFFIX_CHARS=$' \t\n;&'
 
 # Autosuggestions
-source /usr/share/zsh/plugins/zsh-autosuggestions/zsh-autosuggestions.zsh
+source "$HOMEBREW_PREFIX/share/zsh-autosuggestions/zsh-autosuggestions.zsh"
 
 # Syntax highlighting
-source /usr/share/zsh/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh
+source "$HOMEBREW_PREFIX/share/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
 # bat
 alias cat=bat
 alias -g -- -h='-h 2>&1 | bat --language=help --style=plain'
 alias -g -- -help='-help 2>&1 | bat --language=help --style=plain'
 alias -g -- --help='--help 2>&1 | bat --language=help --style=plain'
-export MANPAGER="bat -plman"
+export MANPAGER="sh -c 'ansifilter | bat -plman'"
 
 # fzf
 source <(fzf --zsh)
@@ -145,7 +147,7 @@ zle -N tmux-windowizer-widget
 bindkey ^g tmux-windowizer-widget
 
 # mise
-# eval "$(mise activate zsh)"
+eval "$(mise activate zsh)"
 
 # Prompt
 eval "$(starship init zsh)"
@@ -162,3 +164,5 @@ export LG_CONFIG_FILE="$HOME/.config/lazygit/config.yml,$HOME/.local/share/catpp
 
 # https://github.com/catppuccin/bat
 export BAT_THEME="Catppuccin Mocha"
+
+alias chrome='/Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser'
