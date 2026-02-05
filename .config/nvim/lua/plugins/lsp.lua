@@ -9,12 +9,9 @@ return {
         ensure_installed = {
             "docker_compose_language_service",
             "dockerls",
-            "gopls",
-            -- "herb_ls",
+            "eslint",
             "lua_ls",
             "ruby_lsp",
-            "tailwindcss",
-            "templ",
             "ts_ls",
         },
     },
@@ -64,6 +61,24 @@ return {
                 },
             },
         })
+
+        -- ---@param command lsp.Command
+        -- local function handler(command, ctx)
+        --     vim.notify(command.command)
+        --     for key, value in ipairs(command.arguments) do
+        --         vim.notify(tostring(value))
+        --     end
+        --     -- require("jdtls.async").run(function()
+        --     --     local _, result = request(ctx.bufnr, "java/checkToStringStatus", ctx.params)
+        --     --     local fields = ui.pick_many(result.fields, "Include item in toString?", function(x)
+        --     --         return string.format("%s: %s", x.name, x.type)
+        --     --     end)
+        --     --     local _, edit = request(ctx.bufnr, "java/generateToString", { context = ctx.params, fields = fields })
+        --     --     vim.lsp.util.apply_workspace_edit(edit, offset_encoding)
+        --     -- end)
+        -- end
+
+        -- vim.lsp.commands["rubyLsp.runTestInTerminal"] = handler
 
         vim.api.nvim_create_autocmd("LspAttach", {
             group = vim.api.nvim_create_augroup("my.lsp", {}),

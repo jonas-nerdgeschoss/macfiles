@@ -7,8 +7,10 @@ return {
             javascript = { "prettier" },
             json = { "prettier" },
             markdown = { "mdformat", "prettier" },
+            scss = { "prettier" },
             templ = { "prettier", lsp_format = "last" },
             typescript = { "prettier" },
+            typescriptreact = { "prettier" },
         },
         default_format_opts = {
             lsp_format = "fallback",
@@ -16,7 +18,7 @@ return {
         format_on_save = {},
         formatters = {
             mdformat = {
-                append_args = {"--wrap", "80"}
+                append_args = { "--wrap", "80" },
             },
             tailwindcss_class_sorter_erb = {
                 command = "node_modules/.bin/tailwindcss-class-sorter-erb",

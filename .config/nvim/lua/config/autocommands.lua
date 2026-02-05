@@ -5,3 +5,9 @@ vim.api.nvim_create_autocmd("TextYankPost", {
         vim.highlight.on_yank()
     end,
 })
+
+-- Set slim filetype on *.slim files
+vim.api.nvim_create_autocmd({ "BufNewFile", "BufRead" }, {
+    pattern = { "*.slim" },
+    command = "set ft=slim",
+})

@@ -2,6 +2,7 @@ return {
     "nvim-treesitter/nvim-treesitter",
     build = ":TSUpdate",
     main = "nvim-treesitter.configs",
+    branch = "master",
     dependencies = {
         {
             "nvim-treesitter/nvim-treesitter-context",
@@ -14,6 +15,7 @@ return {
         ensure_installed = {
             "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline",
             "ruby", "embedded_template", "html", "css", "javascript", "dockerfile", "yaml",
+            "graphql", "slim",
         },
         highlight = {
             enable = true,
