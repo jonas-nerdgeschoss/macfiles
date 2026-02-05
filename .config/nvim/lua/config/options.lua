@@ -27,11 +27,3 @@ vim.opt.undolevels = 10000
 
 -- Diagnostics
 vim.diagnostic.config({ virtual_text = true })
-
--- Filetypes
-vim.filetype.add({
-    pattern = {
-        ["compose.*%.ya?ml"] = "yaml.docker-compose",
-        ["docker%-compose.*%.ya?ml"] = "yaml.docker-compose",
-    },
-})

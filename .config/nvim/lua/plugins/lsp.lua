@@ -33,11 +33,6 @@ return {
             },
         })
 
-        vim.lsp.config("herb_ls", {
-            filetypes = { "html", "eruby" },
-        })
-        vim.lsp.enable("herb_ls")
-
         vim.lsp.config("ruby_lsp", {
             cmd = { os.getenv("HOME") .. "/.local/share/mise/shims/ruby-lsp" },
             init_options = {
@@ -47,38 +42,6 @@ return {
                 },
             },
         })
-
-        vim.lsp.config("tailwindcss", {
-            settings = {
-                tailwindCSS = {
-                    experimental = {
-                        -- For `class:` attributes in .erb files
-                        classRegex = {
-                            [=["([^"]*)"]=],
-                            [=['([^']*)']=],
-                        },
-                    },
-                },
-            },
-        })
-
-        -- ---@param command lsp.Command
-        -- local function handler(command, ctx)
-        --     vim.notify(command.command)
-        --     for key, value in ipairs(command.arguments) do
-        --         vim.notify(tostring(value))
-        --     end
-        --     -- require("jdtls.async").run(function()
-        --     --     local _, result = request(ctx.bufnr, "java/checkToStringStatus", ctx.params)
-        --     --     local fields = ui.pick_many(result.fields, "Include item in toString?", function(x)
-        --     --         return string.format("%s: %s", x.name, x.type)
-        --     --     end)
-        --     --     local _, edit = request(ctx.bufnr, "java/generateToString", { context = ctx.params, fields = fields })
-        --     --     vim.lsp.util.apply_workspace_edit(edit, offset_encoding)
-        --     -- end)
-        -- end
-
-        -- vim.lsp.commands["rubyLsp.runTestInTerminal"] = handler
 
         vim.api.nvim_create_autocmd("LspAttach", {
             group = vim.api.nvim_create_augroup("my.lsp", {}),
