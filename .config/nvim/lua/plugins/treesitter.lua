@@ -13,7 +13,7 @@ return {
     config = function()
         local parsers = {
             "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline",
-            "ruby", "embedded_template", "html", "css", "javascript", "dockerfile", "yaml",
+            "ruby", "embedded_template", "html", "css", "javascript", "typescript", "dockerfile", "yaml",
             "graphql", "slim",
         }
         local filetypes = vim.iter(parsers)
