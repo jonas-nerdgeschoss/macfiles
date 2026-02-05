@@ -1,31 +1,10 @@
-[branch]
-    sort = -committerdate
-[column]
-    ui = auto
-[commit]
-    verbose = true
-[diff]
-    algorithm = histogram
-    colorMoved = plain
-    mnemonicprefix = true
-    renames = true
-[init]
-    defaultbranch = main
-; [maintenance]
-;     repo = /home/jole/.dotfiles
-;     repo = /home/jole/code/arch
-;     repo = /home/jole/code/reditus/intern
-[pull]
-    rebase = false
-[push]
-    default = simple
-    autoSetupRemote = true
-    followTags = true
-[rerere]
-    enabled = true
-    autoupdate = true
-[tag]
-    sort = version:refname
 [user]
     name = Jonas Weber
     email = jonas@nerdgeschoss.de
+[filter "lfs"]
+    process = git-lfs filter-process
+    required = true
+    clean = git-lfs clean -- %f
+    smudge = git-lfs smudge -- %f
+[rerere]
+	enabled = true
