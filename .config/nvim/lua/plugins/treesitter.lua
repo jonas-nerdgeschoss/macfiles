@@ -14,7 +14,7 @@ return {
         local parsers = {
             "lua", "vim", "vimdoc", "query", "markdown", "markdown_inline",
             "ruby", "embedded_template", "html", "css", "scss", "javascript", "typescript", "tsx", "dockerfile", "yaml",
-            "graphql", "slim",
+            "graphql", "slim", "sql", "regex", "bash",
         }
         local filetypes = vim.iter(parsers)
             :map(function(parser)
