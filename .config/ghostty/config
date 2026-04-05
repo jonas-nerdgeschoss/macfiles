@@ -4,3 +4,4 @@ confirm-close-surface = false
 keybind = cmd+shift+h=csi:72;3u
 keybind = cmd+shift+l=csi:76;3u
 font-feature = -calt, -liga, -dlig
+env = TERM=xterm-256color
