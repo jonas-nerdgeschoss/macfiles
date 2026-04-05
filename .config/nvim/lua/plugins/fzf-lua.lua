@@ -17,6 +17,10 @@ return {
         fzf_opts = {
             ["--cycle"] = true,
         },
+        grep = {
+            rg_opts =
+            [[--hidden -g "!.git" --column --line-number --no-heading --color=always --smart-case --max-columns=4096 -e]],
+        },
         keymap = {
             fzf = {
                 ["ctrl-q"] = "select-all+accept",
