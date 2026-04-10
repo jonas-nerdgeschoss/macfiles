@@ -1,0 +1,24 @@
+#!/bin/bash
+
+VARIANT="${1:-}"
+
+DIR_NAME="$(basename "$PWD")"
+PROCFILE_DIR="$HOME/code/procfiles"
+
+if [[ -n "$VARIANT" ]]; then
+    PROCFILE="$PROCFILE_DIR/Procfile.${DIR_NAME}_${VARIANT}"
+else
+    PROCFILE="$PROCFILE_DIR/Procfile.${DIR_NAME}"
+fi
+
+if [[ ! -f "$PROCFILE" ]]; then
+    echo "Error: Procfile not found: $PROCFILE"
+    exit 1
+fi
+
+if ! command -v foreman >/dev/null 2>&1; then
+    echo "Installing foreman..."
+    gem install foreman
+fi
+
+exec foreman start -f "$PROCFILE" -d "$PWD"
