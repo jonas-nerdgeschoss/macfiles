@@ -4,6 +4,7 @@ return {
     keys = {
         { "]h",          "<cmd>Gitsigns next_hunk<cr>" },
         { "[h",          "<cmd>Gitsigns prev_hunk<cr>" },
+        { "<leader>gsb", "<cmd>Gitsigns blame<cr>" },
         { "<leader>gsp", "<cmd>Gitsigns preview_hunk<cr>" },
         { "<leader>gsl", "<cmd>Gitsigns preview_hunk_inline<cr>" },
         { "<leader>gsr", "<cmd>Gitsigns reset_hunk<cr>" },
