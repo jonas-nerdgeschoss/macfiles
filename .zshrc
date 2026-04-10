@@ -166,3 +166,7 @@ export LG_CONFIG_FILE="$HOME/.config/lazygit/config.yml,$HOME/.local/share/catpp
 export BAT_THEME="Catppuccin Mocha"
 
 alias chrome='/Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser'
+
+ngserver () {
+  ~/code/servers/ngserver "$(pwd)" "$@"
+}
