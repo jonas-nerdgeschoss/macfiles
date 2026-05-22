@@ -1,0 +1,52 @@
+#!/bin/bash
+
+set -euo pipefail
+
+VARIANT="${1:-}"
+
+DIR_NAME="$(basename "$PWD")"
+PROCFILE_DIR="$HOME/code/procfiles"
+
+# Determine correct Procfile
+if [[ -n "$VARIANT" ]]; then
+    PROCFILE="$PROCFILE_DIR/Procfile.${DIR_NAME}_${VARIANT}"
+else
+    PROCFILE="$PROCFILE_DIR/Procfile.${DIR_NAME}"
+fi
+
+# Exit if no Procfile found
+if [[ ! -f "$PROCFILE" ]]; then
+    echo "Error: Procfile not found: $PROCFILE"
+    exit 1
+fi
+
+# Delete associated Docker volumes after confirmation
+read -r -p "Delete Docker volumes starting with '${DIR_NAME}'? (y/N): " confirm
+case "$confirm" in
+    [yY]|[yY][eE][sS])
+        docker volume ls -q | grep "^${DIR_NAME}" | xargs -r docker volume rm || true
+        ;;
+    *)
+        echo "Skipping Docker volume cleanup."
+        ;;
+esac
+
+# Install foremane if it doesn't exist
+if ! command -v foreman >/dev/null 2>&1; then
+    echo "Installing foreman..."
+    gem install foreman
+fi
+
+# Run the initially needed services (can be configured with a <SERVICE_NAME>.setup_formation file)
+FORMATION_FILE="$PROCFILE_DIR/${DIR_NAME}.setup_formation"
+if [[ -f "$FORMATION_FILE" ]]; then
+    FORMATION_CONTENTS="$(<"$FORMATION_FILE")"
+    foreman start -f "$PROCFILE" -d "$PWD" -m "$FORMATION_CONTENTS" &
+else
+    foreman run -f "$PROCFILE" -d "$PWD" db &
+fi
+
+echo "Giving the DB some time to start up..."
+sleep 5
+
+exec bin/setup

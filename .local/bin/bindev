@@ -16,6 +16,24 @@ if [[ ! -f "$PROCFILE" ]]; then
     exit 1
 fi
 
+# Check for running foreman instance (excluding current script)
+EXISTING_PIDS=$(pgrep -f "foreman" | grep -v $$)
+
+if [[ -n "$EXISTING_PIDS" ]]; then
+    echo "Another foreman instance is already running (PID(s): $EXISTING_PIDS)."
+    read -p "Do you want to terminate it? [y/N]: " ANSWER
+
+    if [[ "$ANSWER" =~ ^[Yy]$ ]]; then
+        echo "Terminating existing foreman instance(s)..."
+        kill $EXISTING_PIDS
+        # Optional: wait for processes to exit
+        sleep 1
+    else
+        echo "Aborting."
+        exit 1
+    fi
+fi
+
 if ! command -v foreman >/dev/null 2>&1; then
     echo "Installing foreman..."
     gem install foreman
