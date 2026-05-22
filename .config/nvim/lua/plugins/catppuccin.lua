@@ -1,9 +1,14 @@
 return {
     "catppuccin/nvim",
-    -- version = "v1.10.0",
     name = "catppuccin",
     priority = 1000,
-    init = function()
+    config = function()
         vim.cmd.colorscheme("catppuccin")
+
+        local sign = vim.fn.sign_define
+
+        sign("DapBreakpoint", { text = "●", texthl = "DapBreakpoint", linehl = "", numhl = "" })
+        sign("DapBreakpointCondition", { text = "●", texthl = "DapBreakpointCondition", linehl = "", numhl = "" })
+        sign("DapLogPoint", { text = "◆", texthl = "DapLogPoint", linehl = "", numhl = "" })
     end,
 }
