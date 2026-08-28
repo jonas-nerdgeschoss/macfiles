@@ -1,0 +1,130 @@
+#! /usr/bin/env ruby
+
+# frozen_string_literal: true
+
+require "webrick"
+
+FILE_TO_WATCH = ARGV.fetch(0).freeze
+
+unless File.file?(FILE_TO_WATCH)
+  abort "File not found: #{FILE_TO_WATCH}"
+end
+
+# Replace this with whatever transformation you want.
+def render(markdown)
+  IO.popen(
+    [
+      "gh", "api",
+      "/markdown",
+      "--method", "POST",
+      "--header", "Accept: text/html",
+      "--field", "mode=gfm",
+      "--raw-field", "text=#{markdown}"
+    ],
+    &:read
+  )
+end
+
+mutex = Mutex.new
+
+state = {
+  html: render(File.read(FILE_TO_WATCH)),
+  version: 0
+}
+
+Thread.new do
+  last_mtime = File.mtime(FILE_TO_WATCH)
+
+  loop do
+    sleep 0.25
+
+    begin
+      mtime = File.mtime(FILE_TO_WATCH)
+
+      next unless mtime > last_mtime
+
+      last_mtime = mtime
+
+      content = File.read(FILE_TO_WATCH)
+      html = render(content)
+
+      mutex.synchronize do
+        state[:html] = html
+        state[:version] += 1
+      end
+    rescue => e
+      warn e.message
+    end
+  end
+end
+
+server = WEBrick::HTTPServer.new(
+  Port: 8000,
+  AccessLog: [],
+  Logger: WEBrick::Log.new($stderr, WEBrick::Log::WARN)
+)
+
+server.mount_proc "/" do |_req, res|
+  version = mutex.synchronize { state[:version] }
+
+  res["Content-Type"] = "text/html"
+
+  res.body = <<~HTML
+    <!doctype html>
+    <html>
+    <head>
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width, initial-scale=1">
+      <title>#{File.basename(FILE_TO_WATCH)}</title>
+
+      <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.8.1/github-markdown.min.css"
+      >
+
+      <style>
+        body {
+          box-sizing: border-box;
+          max-width: 980px;
+          margin: 0 auto;
+          padding: 32px;
+          background-color: #0d1117;
+        }
+      </style>
+
+      <script>
+        (async () => {
+          let version = await fetch("/version").then(r => r.text());
+
+          setInterval(async () => {
+            const next = await fetch("/version", {
+              cache: "no-store"
+            }).then(r => r.text());
+
+            if (next !== version) {
+              location.reload();
+            }
+          }, 500);
+        })();
+      </script>
+
+      </head>
+      <body>
+        <article class="markdown-body">
+          #{mutex.synchronize { state[:html] }}
+        </div>
+      </body>
+      </html>
+  HTML
+end
+
+server.mount_proc "/version" do |_req, res|
+  res["Content-Type"] = "text/plain"
+  res.body = mutex.synchronize { state[:version].to_s }
+end
+
+trap("INT") { server.shutdown }
+
+puts "http://localhost:8000"
+
+server.start
