@@ -1,6 +1,7 @@
 #!/bin/bash
 
 set -euo pipefail
+set -m
 
 VARIANT="${1:-}"
 
@@ -42,11 +43,19 @@ FORMATION_FILE="$PROCFILE_DIR/${DIR_NAME}.setup_formation"
 if [[ -f "$FORMATION_FILE" ]]; then
     FORMATION_CONTENTS="$(<"$FORMATION_FILE")"
     foreman start -f "$PROCFILE" -d "$PWD" -m "$FORMATION_CONTENTS" &
+    SETUP_FORMATION_PID=$!
 else
     foreman run -f "$PROCFILE" -d "$PWD" db &
+    SETUP_FORMATION_PID=$!
 fi
 
-echo "Giving the DB some time to start up..."
+cleanup() {
+    kill -TERM -- "-$SETUP_FORMATION_PID" 2>/dev/null || true
+    wait "$SETUP_FORMATION_PID" 2>/dev/null || true
+}
+trap cleanup SIGINT SIGTERM EXIT
+
+echo "Giving the setup formation some time to start up..."
 sleep 5
 
-exec bin/setup
+bin/setup --skip-server
