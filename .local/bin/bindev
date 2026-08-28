@@ -1,42 +1,81 @@
-#!/bin/bash
+#!/usr/bin/env ruby
 
-VARIANT="${1:-}"
+require "shellwords"
 
-DIR_NAME="$(basename "$PWD")"
-PROCFILE_DIR="$HOME/code/procfiles"
+ENV["PORT"] ||= "3000"
+VERBOSE = ARGV.include?("--verbose") || ARGV.include?("-v") || ENV["VERBOSE"]
+RAILS_ARGS = ARGV - ["--verbose", "-v"]
+FOREMAN_LOG = "log/foreman.log"
 
-if [[ -n "$VARIANT" ]]; then
-    PROCFILE="$PROCFILE_DIR/Procfile.${DIR_NAME}_${VARIANT}"
-else
-    PROCFILE="$PROCFILE_DIR/Procfile.${DIR_NAME}"
-fi
+PROCFILE_DIR = File.join(Dir.home, "code", "procfiles")
 
-if [[ ! -f "$PROCFILE" ]]; then
-    echo "Error: Procfile not found: $PROCFILE"
-    exit 1
-fi
+procfile = File.join(PROCFILE_DIR, "Procfile.#{File.basename(Dir.getwd)}")
+unless File.exist?(procfile)
+  procfile = File.join(Dir.getwd, "Procfile.dev")
+end
+unless File.exist?(procfile)
+  procfile = File.join(Dir.getwd, "Procfile")
+end
 
-# Check for running foreman instance (excluding current script)
-EXISTING_PIDS=$(pgrep -f "foreman" | grep -v $$)
+puts "Using Procfile: #{procfile}"
 
-if [[ -n "$EXISTING_PIDS" ]]; then
-    echo "Another foreman instance is already running (PID(s): $EXISTING_PIDS)."
-    read -p "Do you want to terminate it? [y/N]: " ANSWER
+# Run rails standalone if no Procfile.dev exists
+Process.exec(*%w[bundle exec rails server], *RAILS_ARGS) unless File.exist?(procfile)
 
-    if [[ "$ANSWER" =~ ^[Yy]$ ]]; then
-        echo "Terminating existing foreman instance(s)..."
-        kill $EXISTING_PIDS
-        # Optional: wait for processes to exit
-        sleep 1
-    else
-        echo "Aborting."
-        exit 1
-    fi
-fi
+# Ignore INT so we can handle cleanup ourselves
+Signal.trap("INT") { }
 
-if ! command -v foreman >/dev/null 2>&1; then
-    echo "Installing foreman..."
-    gem install foreman
-fi
+# Install foreman if not present
+if system(*%w[gem list --no-installed --exact --silent foreman])
+  puts "Installing foreman..."
+  system(*%w[gem install foreman])
+end
 
-exec foreman start -f "$PROCFILE" -d "$PWD"
+# Start foreman (background processes) and rails (foreground with logs)
+begin
+  foreman_stdin_r, foreman_stdin_w = IO.pipe
+  foreman_log = VERBOSE ? STDOUT : File.open(FOREMAN_LOG, "a")
+  foreman_pid = Process.spawn(
+    *%W[foreman start -d #{Dir.getwd} -f #{procfile} -m all=1,web=0 --env /dev/null],
+    in: foreman_stdin_r,
+    out: foreman_log,
+    err: foreman_log,
+    pgroup: true
+  )
+  foreman_pgid = Process.getpgid(foreman_pid)
+  rails_command = File.read(procfile).lines.first.gsub("web: ", "").strip
+
+  tokens = Shellwords.split(rails_command)
+  env = {}
+  while tokens.first&.match?(/\A[A-Za-z_][A-Za-z0-9_]*=/)
+    key, value = tokens.shift.split("=", 2)
+    env[key] = value
+  end
+  rails_pid = Process.spawn(env, *tokens, *RAILS_ARGS)
+
+  # Wait for foreman or rails to exit (ignore other subprocesses)
+  loop do
+    exited_pid, = Process.wait2(-1)
+    if exited_pid == foreman_pid
+      foreman_pid = nil
+      Process.kill("INT", rails_pid) rescue Errno::ESRCH
+      $stderr.puts "\n\e[31m!! Foreman crashed !!\e[0m\nCheck #{FOREMAN_LOG} to debug or run bin/dev --verbose"
+      break
+    elsif exited_pid == rails_pid
+      rails_pid = nil
+      break
+    end
+  end
+
+# Cleanup: terminate any remaining processes and close file handles
+ensure
+  if foreman_pid
+    Process.kill("INT", -foreman_pgid)
+    Process.wait(-foreman_pgid) rescue Errno::ECHILD
+  end
+  Process.kill("KILL", rails_pid) rescue Errno::ESRCH if rails_pid
+
+  foreman_log.close if foreman_log.is_a?(File)
+  foreman_stdin_r.close
+  foreman_stdin_w.close
+end
