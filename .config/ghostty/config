@@ -1,5 +1,5 @@
 theme = Catppuccin Mocha
-macos-option-as-alt = left
+macos-option-as-alt = false
 confirm-close-surface = false
 keybind = cmd+shift+h=csi:72;3u
 keybind = cmd+shift+l=csi:76;3u
