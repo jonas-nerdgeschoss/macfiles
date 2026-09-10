@@ -139,13 +139,6 @@ tmux-sessionizer-widget() {
 zle -N tmux-sessionizer-widget
 bindkey ^f tmux-sessionizer-widget
 
-# tmux-windowizer
-tmux-windowizer-widget() {
-    tmux-windowizer <>$TTY
-}
-zle -N tmux-windowizer-widget
-bindkey ^g tmux-windowizer-widget
-
 # mise
 eval "$(mise activate zsh)"
 
