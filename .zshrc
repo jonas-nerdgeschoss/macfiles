@@ -160,6 +160,6 @@ export BAT_THEME="Catppuccin Mocha"
 
 alias chrome='/Applications/Brave\ Browser.app/Contents/MacOS/Brave\ Browser'
 
-ngserver () {
+ng () {
   ~/code/servers/ngserver "$(pwd)" "$@"
 }
