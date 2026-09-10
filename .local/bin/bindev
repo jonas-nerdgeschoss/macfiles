@@ -59,7 +59,7 @@ begin
     if exited_pid == foreman_pid
       foreman_pid = nil
       Process.kill("INT", rails_pid) rescue Errno::ESRCH
-      $stderr.puts "\n\e[31m!! Foreman crashed !!\e[0m\nCheck #{FOREMAN_LOG} to debug or run bin/dev --verbose"
+      $stderr.puts "\n\e[31m!! Foreman crashed !!\e[0m\nCheck #{FOREMAN_LOG} to debug or run bindev --verbose"
       break
     elsif exited_pid == rails_pid
       rails_pid = nil
