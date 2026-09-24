@@ -32,7 +32,7 @@ case "$confirm" in
         ;;
 esac
 
-# Install foremane if it doesn't exist
+# Install foreman if it doesn't exist
 if ! command -v foreman >/dev/null 2>&1; then
     echo "Installing foreman..."
     gem install foreman
