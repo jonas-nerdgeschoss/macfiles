@@ -41,10 +41,6 @@ return {
                         enablePendingMigrationsPrompt = false,
                     },
                 },
-                --     formatter = "rubocop",
-                --     linters = {
-                --         "rubocop",
-                --     },
             },
         })
 
