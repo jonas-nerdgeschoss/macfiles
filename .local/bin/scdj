@@ -5,9 +5,10 @@
 set -e
 
 selected=$(
-    gh search repos $* --json fullName,name,description,updatedAt,stargazersCount --template \
-    '{{tablerow "Name" "Directory Name" "Description" "Updated" "Stars"}}{{range .}}{{tablerow .fullName .name .description (timeago .updatedAt) .stargazersCount}}{{end}}' \
-    | fzf --cycle --header-lines 1
+    (
+        gh search repos $* --json fullName,name,description,updatedAt,stargazersCount --template \
+        '{{tablerow "Name" "Directory Name" "Description" "Updated" "Stars"}}{{range .}}{{tablerow .fullName .name .description (timeago .updatedAt) .stargazersCount}}{{end}}' \
+    ) | fzf --cycle --header-lines 1
 )
 
 repository=$(echo "$selected" | awk '{print $1;}')
