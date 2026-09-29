@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+ISSUE="$1"
+
+gh issue comment "$ISSUE" --edit-last --create-if-none --editor
