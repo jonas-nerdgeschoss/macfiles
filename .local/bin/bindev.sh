@@ -1,6 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
-set -e
+set -euo pipefail
 
 DIR_NAME="$(basename "$PWD")"
 PROCFILE_DIR="$HOME/code/procfiles"

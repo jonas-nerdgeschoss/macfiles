@@ -1,6 +1,8 @@
-#!/bin/bash
+#!/usr/bin/env bash
 
 set -euo pipefail
+
+# Enable job control
 set -m
 
 VARIANT="${1:-}"
