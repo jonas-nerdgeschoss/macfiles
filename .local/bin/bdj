@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+if [[ $# -ne 1 ]]; then
+    printf 'Usage: %s GEM_NAME\n' "$0" >&2
+    exit 2
+fi
+
+GEM_NAME=$1
+
+if ! tmux select-window -t "$GEM_NAME"; then
+    tmux new-window -n "$GEM_NAME"
+    tmux send-keys "bundle open $GEM_NAME" Enter
+fi

@@ -11,7 +11,18 @@ return {
         { "<leader>fcg", function() require("fzf-lua").live_grep({ cwd = vim.fn.stdpath("config") }) end },
         { "<leader>fcr", function() require("fzf-lua").oldfiles({ cwd = vim.fn.stdpath("config"), cwd_only = true }) end },
         { "<leader>fh",  function() require("fzf-lua").helptags() end },
-        { "z=",          function() require("fzf-lua").spell_suggest() end },
+        { "<leader>fj", function()
+            require("fzf-lua").fzf_exec("bundle list --name-only", {
+                actions = {
+                    ["default"] = function(selected)
+                        vim.fn.system({ "bdj", selected[1] })
+                    end,
+                },
+                preview = "cat $(bundle show {})/README.md",
+            })
+        end },
+        { "<leader>fk", function() require("fzf-lua").live_grep({ search = vim.fn.expand("<cword>") }) end },
+        { "z=",         function() require("fzf-lua").spell_suggest() end },
     },
     opts = {
         fzf_opts = {
