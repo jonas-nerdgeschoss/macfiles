@@ -4,13 +4,11 @@ return {
         "echasnovski/mini.icons",
     },
     keys = {
-        { "<leader>ff",  function() require("fzf-lua").files() end },
-        { "<leader>fg",  function() require("fzf-lua").live_grep() end },
-        { "<leader>fr",  function() require("fzf-lua").oldfiles({ cwd_only = true }) end },
-        { "<leader>fcf", function() require("fzf-lua").files({ cwd = vim.fn.stdpath("config") }) end },
-        { "<leader>fcg", function() require("fzf-lua").live_grep({ cwd = vim.fn.stdpath("config") }) end },
-        { "<leader>fcr", function() require("fzf-lua").oldfiles({ cwd = vim.fn.stdpath("config"), cwd_only = true }) end },
-        { "<leader>fh",  function() require("fzf-lua").helptags() end },
+        { "<leader>ff", function() require("fzf-lua").files() end },
+        { "<leader>fg", function() require("fzf-lua").live_grep() end },
+        { "<leader>fr", function() require("fzf-lua").oldfiles({ cwd_only = true }) end },
+        { "<leader>fd", function() require("fzf-lua").git_diff() end },
+        { "<leader>fh", function() require("fzf-lua").helptags() end },
         { "<leader>fj", function()
             require("fzf-lua").fzf_exec("bundle list --name-only", {
                 actions = {
